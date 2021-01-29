@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>  
+    <title>TODO</title>
+</head>
+<body>
+    <div class="container">
+        <div class="jumbotron">
+            <h1>Welcome to RandomSkool</h1>
+            <h2>Free TODO Service</h2>
+            <br>
+            <div class="form-group">
+                <label for="todo">Todo:</label>
+                <input type="text" id="todo" class="form-control">
+                <label for="desc">Description:</label>
+                <textarea class="form-control" rows="5" id="desc"></textarea>
+            </div>
+            <br>
+            <button id="add" class="btn btn-success btn-md" onclick="add_local()">Add</button>
+            <button id="cleared" class="btn btn-danger btn-md">Clear</button>
+        </div>
+        <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">SNo</th>
+                <th scope="col">Item Title</th>
+                <th scope="col">Item Description</th> 
+                <th scope="col">Actions</th> 
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <tr>
+                <th scope="row"></th>
+                <td></td>
+                <td></td> 
+                <td></td> 
+              </tr>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        let todo_box = document.getElementById("todo");
+        let desc_box = document.getElementById("desc");
+        let clear_box = document.getElementById("cleared");
+        clear_box.onclick = function () {
+            if (confirm("Want to Clear?")) {
+                localStorage.clear();
+                window.location.reload();
+            };         
+        }
+        function add_local() {
+                let todo_text = todo_box.value;
+                let desc_text = desc_box.value;
+                
+                if (localStorage.getItem('itemJson')==null){
+                    itemJsonArray = [];
+                    itemJsonArray.push([todo_text,desc_text]);
+                    localStorage.setItem('itemJson', JSON.stringify(itemJsonArray));
+                }
+                else {
+                    itemJsonStr = localStorage.getItem('itemJson');
+                    itemJsonArray = JSON.parse(itemJsonStr);
+                    itemJsonArray.push([todo_text,desc_text]);
+                    localStorage.setItem('itemJson', JSON.stringify(itemJsonArray));
+                }
+                
+            update_row();
+        }
+
+        function update_row(){
+                if (localStorage.getItem('itemJson')==null){
+                    itemJsonArray = []; 
+                    localStorage.setItem('itemJson', JSON.stringify(itemJsonArray))
+                } 
+                else{
+                    itemJsonArrayStr = localStorage.getItem('itemJson')
+                    itemJsonArray = JSON.parse(itemJsonArrayStr); 
+                }
+                // Populate the table
+                let tableBody = document.getElementById("tableBody");
+                let str = "";
+                itemJsonArray.forEach((element, index) => {
+                    str += `
+                    <tr>
+                    <td>${index + 1}</td>
+                    <td>${element[0]}</td>
+                    <td>${element[1]}</td> 
+                    <td><button class="btn btn-xs btn-danger" onclick="deleted(${index})">Delete</button></td> 
+                    </tr>`; 
+                });
+                tableBody.innerHTML = str;
+            }
+        
+        function deleted(index) {
+            itemJsonArrayStr = localStorage.getItem('itemJson');
+            itemJsonArray = JSON.parse(itemJsonArrayStr);
+            itemJsonArray.splice(index,1);
+            localStorage.setItem('itemJson',JSON.stringify(itemJsonArray));
+            update_row();
+        }
+
+        
+    </script>
+</body>
+</html>
